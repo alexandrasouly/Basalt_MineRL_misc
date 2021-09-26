@@ -34,7 +34,7 @@ def insert_traj_pair(left_id:str, right_id:str):
     conn.commit()
 
 def rate_traj_pair(left_id, right_id, preference): 
-    """ Rate a pair of IDs: 1 for left, 2 for right, 3 for undecided"""
+    """ Rate a pair of IDs: 1 for left, 2 for right, 3 for equally good, 4 for undecided"""
     if left_id == right_id:
         raise Exception("The supplied IDs are the same")
     if left_id > right_id:
@@ -42,8 +42,8 @@ def rate_traj_pair(left_id, right_id, preference):
 
     if get_rating_of_pair(left_id, right_id) != 0:
         raise Exception("This pair was already rated")
-    stmt = '''UPDATE trajectories SET 'preference' = '{}' WHERE left_id = {} AND right_id = {}'''.format(preference, left_id, right_id) 
-    c.execute(stmt) 
+    stmt = '''UPDATE trajectories SET 'preference' = ? WHERE left_id = ? AND right_id = ? '''
+    c.execute(stmt,(preference, left_id, right_id))
     conn.commit()
 
 def get_all_unrated_pairs() -> List[Tuple[str]]:
@@ -70,7 +70,7 @@ def get_rating_of_pair(left_id, right_id) -> int:
     if left_id > right_id:
         left_id, right_id = right_id, left_id
 
-    c.execute('''SELECT * FROM trajectories WHERE left_id = {} AND right_id = {}'''.format(left_id,right_id))
+    c.execute('''SELECT * FROM trajectories WHERE left_id = ? AND right_id = ?''',(left_id,right_id))
     traj_pair = c.fetchall()
     if  len(traj_pair)==0:
         raise Exception("Pair not found in database")
@@ -89,7 +89,7 @@ def delete_pair(left_id, right_id):
     if left_id > right_id:
         left_id, right_id = right_id, left_id
 
-    c.execute('''DELETE FROM trajectories WHERE left_id = {} AND right_id = {}'''.format(left_id,right_id)) 
+    c.execute('''DELETE FROM trajectories WHERE left_id = ? AND right_id = ?''',(left_id,right_id)) 
     conn.commit()
 
 def return_all_data():
@@ -114,6 +114,7 @@ if __name__ == '__main__':
     # insert_traj_pair("1000", "1001")
     # insert_traj_pair("1000", "1003")
     # insert_traj_pair("1001", "1002")
-
+    import numpy as np
+    print(np.load(f"trajectories/285223_traj_0_smpl_0.npy"))
     print(return_all_ids())
     print(return_all_data())

@@ -3,6 +3,7 @@ import numpy as np
 from database import return_all_ids, insert_traj_pair, create_table
 import os
 import random
+import minerl
 
 def step_random_policy(environment):
     action = environment.action_space.sample()
